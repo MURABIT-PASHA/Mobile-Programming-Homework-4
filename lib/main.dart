@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:homework_4/login_page.dart';
+import 'package:homework_4/registration_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +16,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: LoginPage.id,
+      routes: {
+        LoginPage.id : (context) => const LoginPage(),
+        RegistrationPage.id : (context) => const RegistrationPage()
+      },
     );
   }
 }
