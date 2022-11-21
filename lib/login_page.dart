@@ -6,7 +6,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'home_page.dart';
 
-
 class LoginPage extends StatefulWidget {
   static String id = "login_id";
   const LoginPage({Key? key}) : super(key: key);
@@ -27,7 +26,11 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: Text("LOGIN", style: TextStyle(fontFamily: "Dongle", fontSize: 70, color: activeColor),),
+        title: Text(
+          "LOGIN",
+          style:
+              TextStyle(fontFamily: "Dongle", fontSize: 70, color: activeColor),
+        ),
         centerTitle: true,
       ),
       body: Center(
@@ -35,7 +38,8 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Text(
               "Username",
-              style: TextStyle(fontFamily: "Dongle", fontSize: 30, color: activeColor),
+              style: TextStyle(
+                  fontFamily: "Dongle", fontSize: 30, color: activeColor),
               textAlign: TextAlign.center,
             ),
             Container(
@@ -43,13 +47,15 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
-                onChanged: (value){
+                onChanged: (value) {
                   username = value;
                 },
                 decoration: InputDecoration(
                   hintText: "Type your username",
-                  hintStyle:
-                      TextStyle(fontFamily: "Dongle", fontSize: 25, color: nonactiveColor),
+                  hintStyle: TextStyle(
+                      fontFamily: "Dongle",
+                      fontSize: 25,
+                      color: nonactiveColor),
                   prefix: Icon(
                     Icons.person,
                     color: nonactiveColor,
@@ -59,7 +65,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Text(
               "Password",
-              style: TextStyle(fontFamily: "Dongle", fontSize: 30, color: activeColor),
+              style: TextStyle(
+                  fontFamily: "Dongle", fontSize: 30, color: activeColor),
               textAlign: TextAlign.center,
             ),
             Container(
@@ -67,14 +74,16 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
-                onChanged: (value){
+                onChanged: (value) {
                   password = value;
                 },
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: "Type your password",
-                  hintStyle:
-                      TextStyle(fontFamily: "Dongle", fontSize: 25, color: nonactiveColor),
+                  hintStyle: TextStyle(
+                      fontFamily: "Dongle",
+                      fontSize: 25,
+                      color: nonactiveColor),
                   prefix: Icon(
                     Icons.lock,
                     color: nonactiveColor,
@@ -83,40 +92,50 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             GestureDetector(
-              onTap: () async{
+              onTap: () async {
                 final file = await _localFile;
-                if(await file.exists()){
+                if (await file.exists()) {
                   try {
-                    file.openRead()
+                    file
+                        .openRead()
                         .transform(utf8.decoder)
                         .transform(const LineSplitter())
                         .forEach((line) {
-                          var user = line.toString().split(",");
-                          if (user[0] == username && user[1] == password){
-                              Navigator.push(context, MaterialPageRoute(builder: (builder)=>HomePage(title: user[2])));
-                              controlFlag = 1;
-                          }
+                      var user = line.toString().split(",");
+                      if (user[0] == username && user[1] == password) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (builder) =>
+                                    HomePage(title: user[2])));
+                        controlFlag = 1;
+                      }
                     });
-                    if (controlFlag == 0){
-                      showDialog(context: context, builder: (builder)=> const AlertDialog(
-                        content: Text("User couldn't find"),
-                      ));
+                    if (controlFlag == 0) {
+                      showDialog(
+                          context: context,
+                          builder: (builder) => const AlertDialog(
+                                content: Text("User couldn't find"),
+                              ));
                     }
-                  }catch (exception){
-                    showDialog(context: context, builder: (builder)=> const AlertDialog(
-                      content: Text("Source couldn't find"),
-                    ));
+                  } catch (exception) {
+                    showDialog(
+                        context: context,
+                        builder: (builder) => const AlertDialog(
+                              content: Text("Source couldn't find"),
+                            ));
                   }
-                }
-                else{
-                  showDialog(context: context, builder: (builder)=> const AlertDialog(
-                    content: Text("Source couldn't find"),
-                  ));
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: (builder) => const AlertDialog(
+                            content: Text("Source couldn't find"),
+                          ));
                 }
               },
               child: Container(
-                margin: const EdgeInsets.all(50),
-                alignment: Alignment.center,
+                  margin: const EdgeInsets.all(50),
+                  alignment: Alignment.center,
                   height: 50,
                   width: MediaQuery.of(context).size.width - 50,
                   decoration: BoxDecoration(
@@ -125,24 +144,33 @@ class _LoginPageState extends State<LoginPage> {
                           colors: [Color(0xFF65D5E1), Color(0xFFE73EF9)])),
                   child: const Text(
                     "LOGIN",
-                    style: TextStyle(fontFamily: "Dongle", fontSize: 30, color: Colors.white),
+                    style: TextStyle(
+                        fontFamily: "Dongle",
+                        fontSize: 30,
+                        color: Colors.white),
                   )),
             ),
             TextButton(
                 onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(context, RegistrationPage.id, (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, RegistrationPage.id, (route) => false);
                 },
-                child: const Text("You don't have an account? Sign Up", style: TextStyle(fontFamily: "Dongle", color: Colors.indigo),))
+                child: const Text(
+                  "You don't have an account? Sign Up",
+                  style: TextStyle(fontFamily: "Dongle", color: Colors.indigo),
+                ))
           ],
         ),
       ),
     );
   }
+
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
 
     return directory.path;
   }
+
   Future<File> get _localFile async {
     final path = await _localPath;
     return File('$path/users.txt');
