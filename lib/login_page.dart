@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:homework_4/registration_page.dart';
+import 'package:path_provider/path_provider.dart';
+
 
 class LoginPage extends StatefulWidget {
   static String id = "login_id";
@@ -14,9 +16,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    // File('file.txt').readAsString().then((String contents) {
-    //   print(contents);
-    // });
+    String username = "";
+    String password = "";
+    int controlFlag = 0;
     Color activeColor = const Color(0xFF000000);
     Color nonactiveColor = const Color(0xFFADADAD);
     return Scaffold(
@@ -39,6 +41,9 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
+                onChanged: (value){
+                  username = value;
+                },
                 decoration: InputDecoration(
                   hintText: "Type your username",
                   hintStyle:
@@ -60,6 +65,9 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
+                onChanged: (value){
+                  password = value;
+                },
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: "Type your password",
@@ -73,7 +81,32 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () async{
+                final file = await _localFile;
+                if(await file.exists()){
+                  try {
+                    file.openRead()
+                        .transform(utf8.decoder)
+                        .transform(const LineSplitter())
+                        .forEach((line) {
+                          var user = line.toString().split(",");
+                          if (user[0] == username && user[1] == password){
+                              Navigator.pushNamedAndRemoveUntil(context, RegistrationPage.id, (route) => false);
+                              controlFlag = 1;
+                          }
+                    });
+                    if (controlFlag == 0){
+                      showDialog(context: context, builder: (builder)=> const AlertDialog(
+                        content: Text("User couldn't find"),
+                      ));
+                    }
+                  }catch (exception){
+                    showDialog(context: context, builder: (builder)=> const AlertDialog(
+                      content: Text("Source couldn't find"),
+                    ));
+                  }
+                }
+              },
               child: Container(
                 margin: const EdgeInsets.all(50),
                 alignment: Alignment.center,
@@ -97,5 +130,14 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/users.txt');
   }
 }

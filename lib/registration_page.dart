@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'home_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   static String id = "register_id";
@@ -15,6 +20,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     Color nonactiveColor = const Color(0xFFADADAD);
     String username = "";
     String password = "";
+    int controlFlag = 0;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -35,6 +41,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
+                onEditingComplete: (){
+                  controlFlag = 0;
+                },
                 onChanged: (value){
                   username = value;
                 },
@@ -75,7 +84,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
             ),
             GestureDetector(
-              onTap: (){
+              onTap: () async{
+                final file = await _localFile;
+                if(await file.exists()){
+                  try {
+                    file.openRead()
+                    .transform(utf8.decoder)
+                    .transform(const LineSplitter())
+                    .forEach((line) {
+                      if(line[0] == username){
+                        showDialog(context: context, builder: (builder)=> const AlertDialog(content: Text("Already have a user"),));
+                        controlFlag = 1;
+                      }
+                    });
+                    if (controlFlag == 0){
+                      await file.writeAsString("$username,$password\n", mode: FileMode.append);
+                      setState(() {
+                        Navigator.pushNamedAndRemoveUntil(context, HomePage.id, (route) => false);
+                      });
+                    }
+                  }catch (exception){
+                    await file.writeAsString("$username,$password\n", mode: FileMode.write);
+                  }
+                }
               },
               child: Container(
                   margin: const EdgeInsets.all(50),
@@ -95,5 +126,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
     );
+  }
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/users.txt');
   }
 }

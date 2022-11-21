@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:homework_4/home_page.dart';
 import 'package:homework_4/login_page.dart';
 import 'package:homework_4/registration_page.dart';
 
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
       initialRoute: LoginPage.id,
       routes: {
         LoginPage.id : (context) => const LoginPage(),
-        RegistrationPage.id : (context) => const RegistrationPage()
+        RegistrationPage.id : (context) => const RegistrationPage(),
+        HomePage.id : (context) => const HomePage()
       },
     );
   }
