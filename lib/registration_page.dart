@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:homework_4/login_page.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'home_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   static String id = "register_id";
@@ -20,6 +20,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     Color nonactiveColor = const Color(0xFFADADAD);
     String username = "";
     String password = "";
+    String name = "";
     int controlFlag = 0;
     return Scaffold(
       appBar: AppBar(
@@ -31,6 +32,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
       body: Center(
         child: ListView(
           children: [
+            Text(
+              "Name",
+              style: TextStyle(fontFamily: "Dongle", fontSize: 30, color: activeColor),
+              textAlign: TextAlign.center,
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+              width: MediaQuery.of(context).size.width - 20,
+              height: 40,
+              child: TextField(
+                onChanged: (value){
+                  name = value;
+                },
+                decoration: InputDecoration(
+                  hintText: "Type your name",
+                  hintStyle:
+                  TextStyle(fontFamily: "Dongle", fontSize: 25, color: nonactiveColor),
+                  prefix: Icon(
+                    Icons.person,
+                    color: nonactiveColor,
+                  ),
+                ),
+              ),
+            ),
             Text(
               "Username",
               style: TextStyle(fontFamily: "Dongle", fontSize: 30, color: activeColor),
@@ -86,26 +111,38 @@ class _RegistrationPageState extends State<RegistrationPage> {
             GestureDetector(
               onTap: () async{
                 final file = await _localFile;
-                if(await file.exists()){
+                if(await file.exists()) {
                   try {
                     file.openRead()
-                    .transform(utf8.decoder)
-                    .transform(const LineSplitter())
-                    .forEach((line) {
-                      if(line[0] == username){
-                        showDialog(context: context, builder: (builder)=> const AlertDialog(content: Text("Already have a user"),));
+                        .transform(utf8.decoder)
+                        .transform(const LineSplitter())
+                        .forEach((line) {
+                      if (line[0] == username) {
+                        showDialog(context: context, builder: (builder) =>
+                        const AlertDialog(
+                          content: Text("Already have a user"),));
                         controlFlag = 1;
                       }
                     });
-                    if (controlFlag == 0){
-                      await file.writeAsString("$username,$password\n", mode: FileMode.append);
+                    if (controlFlag == 0) {
+                      await file.writeAsString(
+                          "$username,$password,$name\n", mode: FileMode.append);
                       setState(() {
-                        Navigator.pushNamedAndRemoveUntil(context, HomePage.id, (route) => false);
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, LoginPage.id, (route) => false);
                       });
                     }
-                  }catch (exception){
-                    await file.writeAsString("$username,$password\n", mode: FileMode.write);
+                  } catch (exception) {
+                    await file.writeAsString(
+                        "$username,$password,$name\n", mode: FileMode.write);
                   }
+                }else{
+                  await file.writeAsString(
+                      "$username,$password,$name\n", mode: FileMode.write);
+                  setState(() {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, LoginPage.id, (route) => false);
+                  });
                 }
               },
               child: Container(

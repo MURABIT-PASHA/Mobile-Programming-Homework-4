@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:homework_4/registration_page.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'home_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   static String id = "login_id";
@@ -91,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                         .forEach((line) {
                           var user = line.toString().split(",");
                           if (user[0] == username && user[1] == password){
-                              Navigator.pushNamedAndRemoveUntil(context, RegistrationPage.id, (route) => false);
+                              Navigator.push(context, MaterialPageRoute(builder: (builder)=>HomePage(title: user[2])));
                               controlFlag = 1;
                           }
                     });
@@ -105,6 +107,11 @@ class _LoginPageState extends State<LoginPage> {
                       content: Text("Source couldn't find"),
                     ));
                   }
+                }
+                else{
+                  showDialog(context: context, builder: (builder)=> const AlertDialog(
+                    content: Text("Source couldn't find"),
+                  ));
                 }
               },
               child: Container(
