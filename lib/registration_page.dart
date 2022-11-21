@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 class RegistrationPage extends StatefulWidget {
   static String id = "register_id";
@@ -77,10 +75,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
             ),
             GestureDetector(
-              onTap: () async{
-                final file = await _localFile;
-                // var myFile = File('users.txt').openWrite(mode: FileMode.writeOnlyAppend);
-                // myFile.write("$username,$password\n");
+              onTap: (){
               },
               child: Container(
                   margin: const EdgeInsets.all(50),
@@ -100,14 +95,5 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
     );
-  }
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    return directory.path;
-  }
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/users.txt');
   }
 }
