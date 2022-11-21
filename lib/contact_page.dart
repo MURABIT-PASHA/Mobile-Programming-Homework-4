@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:homework_4/edit_page.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ContactPage extends StatefulWidget {
@@ -57,7 +58,9 @@ class _ContactPageState extends State<ContactPage> {
                       title: Text(contacts[index].replaceAll(",", " "),style: const TextStyle(color: Colors.white),),
                       trailing: IconButton(
                         icon: const Icon(Icons.edit, color: Colors.white,),
-                        onPressed: () {},
+                        onPressed: () {
+                           Navigator.push(context, MaterialPageRoute(builder: (builder)=>EditPage(contactInfo: contacts[index])));
+                        },
                       ),
                     );
                   });

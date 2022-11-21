@@ -103,11 +103,11 @@ class _LoginPageState extends State<LoginPage> {
                         .forEach((line) {
                       var user = line.toString().split(",");
                       if (user[0] == username && user[1] == password) {
-                        Navigator.push(
+                        Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
                                 builder: (builder) =>
-                                    HomePage(title: user[2])));
+                                    HomePage(title: user[2])),(route)=>false);
                         controlFlag = 1;
                       }
                     });

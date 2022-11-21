@@ -92,11 +92,9 @@ class _AddPageState extends State<AddPage> {
                 width: MediaQuery.of(context).size.width - 20,
                 height: 40,
                 child: TextField(
-                  onEditingComplete: (){
-                    controlFlag = 0;
-                  },
                   onChanged: (value) {
                     number = value;
+                    controlFlag = 0;
                   },
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
@@ -112,45 +110,40 @@ class _AddPageState extends State<AddPage> {
                   ),
                 ),
               ),
-              ElevatedButton(onPressed: ()async{
-                final file = await _localFile;
-                if(await file.exists()) {
-                  try {
-                    file.openRead()
-                        .transform(utf8.decoder)
-                        .transform(const LineSplitter())
-                        .forEach((line) {
-                      if (line[2] == number) {
-                        showDialog(context: context, builder: (builder) =>
-                        const AlertDialog(
-                          content: Text("Already have a contact"),));
-                        controlFlag = 1;
-                      }
-                    });
-                    if (controlFlag == 0) {
-                      await file.writeAsString(
-                          "$name,$surname,$number\n", mode: FileMode.append);
-                      setState(() {
-                      });
+              ElevatedButton(
+                  onPressed: () async {
+                    final file = await _localFile;
+                    if (!await file.exists()) {
+                      file.create();
                     }
-                  } catch (exception) {
-                    await file.writeAsString(
-                        "$name,$surname,$number\n", mode: FileMode.write);
-                  }
-                }else{
-                  await file.writeAsString(
-                      "$name,$surname,$number\n", mode: FileMode.write);
-                  setState(() {
-                  });
-                }
-              },
+                      var sinkR = file.openRead();
+                      var sinkW = file.openWrite(mode: FileMode.append);
+                      await sinkR
+                          .transform(utf8.decoder)
+                          .transform(const LineSplitter())
+                          .forEach((line) {
+                        if (line.split(",")[2] == number) {
+                          showDialog(
+                              context: context,
+                              builder: (builder) => const AlertDialog(
+                                    content: Text("Already have a contact"),
+                                  ));
+                          controlFlag = 1;
+                        }
+                      });
+                      if (controlFlag == 0) {
+                        sinkW.write("$name,$surname,$number\n");
+                        sinkW.close();
+                        setState(() {
+                          Navigator.pop(context);
+                        });
+                      }
+                  },
                   style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)
-                    ),
-                    backgroundColor: Colors.green,
-                    maximumSize: const Size(200, 50)
-                  ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      backgroundColor: Colors.green,
+                      maximumSize: const Size(200, 50)),
                   child: const Text("Add"))
             ],
           ),
@@ -158,6 +151,7 @@ class _AddPageState extends State<AddPage> {
       ),
     );
   }
+
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
     return directory.path;

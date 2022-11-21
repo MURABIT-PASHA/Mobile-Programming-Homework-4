@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:homework_4/contact_page.dart';
 import 'package:lottie/lottie.dart';
-
 import 'add_page.dart';
 
 class HomePage extends StatefulWidget {
