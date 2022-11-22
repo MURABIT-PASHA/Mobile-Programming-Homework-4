@@ -119,30 +119,7 @@ class _EditPageState extends State<EditPage> {
                   children: [
                     ElevatedButton(
                         onPressed: () async {
-                          print("$name, $surname, $number");
-                          final file = await _localFile;
-                          var sinkR = file.openRead();
-                          var sinkW = file.openWrite(mode: FileMode.append);
-                          var sinkF = file.openWrite(mode: FileMode.write);
-                          await sinkR
-                              .transform(utf8.decoder)
-                              .transform(const LineSplitter())
-                              .forEach((line) {
-                            if (line != widget.contactInfo) {
-                              contacts.add(line);
-                            }
-                          });
-                          for (int i = 0; i < contacts.length; i++) {
-                            list += contacts[i];
-                            list += "\n";
-                          }
-                            sinkF.write(list);
-                            sinkF.close();
-                            sinkW.write("$name,$surname,$number\n");
-                            sinkW.close();
-                          setState(() {
-                            Navigator.pop(context);
-                          });
+
                         },
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -152,27 +129,7 @@ class _EditPageState extends State<EditPage> {
                         child: const Text("Save")),
                     ElevatedButton(
                         onPressed: () async {
-                          final file = await _localFile;
-                          var sinkR = file.openRead();
-                          var sinkW = file.openWrite(mode: FileMode.append);
-                          await sinkR
-                              .transform(utf8.decoder)
-                              .transform(const LineSplitter())
-                              .forEach((line) {
-                            if (line != widget.contactInfo) {
-                              contacts.add(line);
-                              print(line);
-                            }
-                          });
-                          for (int i = 0; i < contacts.length; i++) {
-                            list += contacts[i];
-                            list += "\n";
-                          }
-                          sinkW.write(list);
-                          sinkW.close();
-                          setState(() {
-                            Navigator.pop(context);
-                          });
+
                         },
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(

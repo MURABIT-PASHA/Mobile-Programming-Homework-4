@@ -1,8 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 class AddPage extends StatefulWidget {
   static String id = "add_id";
@@ -20,7 +16,6 @@ class _AddPageState extends State<AddPage> {
     String name = "";
     String surname = "";
     String number = "";
-    int controlFlag = 0;
     return Scaffold(
       body: Center(
         child: Container(
@@ -94,7 +89,6 @@ class _AddPageState extends State<AddPage> {
                 child: TextField(
                   onChanged: (value) {
                     number = value;
-                    controlFlag = 0;
                   },
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
@@ -112,32 +106,6 @@ class _AddPageState extends State<AddPage> {
               ),
               ElevatedButton(
                   onPressed: () async {
-                    final file = await _localFile;
-                    if (!await file.exists()) {
-                      file.create();
-                    }
-                      var sinkR = file.openRead();
-                      var sinkW = file.openWrite(mode: FileMode.append);
-                      await sinkR
-                          .transform(utf8.decoder)
-                          .transform(const LineSplitter())
-                          .forEach((line) {
-                        if (line.split(",")[2] == number) {
-                          showDialog(
-                              context: context,
-                              builder: (builder) => const AlertDialog(
-                                    content: Text("Already have a contact"),
-                                  ));
-                          controlFlag = 1;
-                        }
-                      });
-                      if (controlFlag == 0) {
-                        sinkW.write("$name,$surname,$number\n");
-                        sinkW.close();
-                        setState(() {
-                          Navigator.pop(context);
-                        });
-                      }
                   },
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -150,15 +118,5 @@ class _AddPageState extends State<AddPage> {
         ),
       ),
     );
-  }
-
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/contacts.txt');
   }
 }

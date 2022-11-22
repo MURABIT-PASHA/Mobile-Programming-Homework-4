@@ -1,9 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:homework_4/login_page.dart';
-import 'package:path_provider/path_provider.dart';
-
+import 'package:homework_4/user_manager.dart';
 
 class RegistrationPage extends StatefulWidget {
   static String id = "register_id";
@@ -18,10 +15,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     Color activeColor = const Color(0xFF000000);
     Color nonactiveColor = const Color(0xFFADADAD);
+    TextEditingController usernameController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+    TextEditingController nameController = TextEditingController();
     String username = "";
     String password = "";
     String name = "";
-    int controlFlag = 0;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -42,6 +41,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
+                controller: nameController,
                 onChanged: (value){
                   name = value;
                 },
@@ -66,9 +66,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
-                onEditingComplete: (){
-                  controlFlag = 0;
-                },
+                controller: usernameController,
                 onChanged: (value){
                   username = value;
                 },
@@ -93,6 +91,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
+                controller: passwordController,
                 onChanged: (value){
                   password = value;
                 },
@@ -110,39 +109,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
             ),
             GestureDetector(
               onTap: () async{
-                final file = await _localFile;
-                if(await file.exists()) {
-                  try {
-                    file.openRead()
-                        .transform(utf8.decoder)
-                        .transform(const LineSplitter())
-                        .forEach((line) {
-                      if (line[0] == username) {
-                        showDialog(context: context, builder: (builder) =>
-                        const AlertDialog(
-                          content: Text("Already have a user"),));
-                        controlFlag = 1;
-                      }
-                    });
-                    if (controlFlag == 0) {
-                      await file.writeAsString(
-                          "$username,$password,$name\n", mode: FileMode.append);
-                      setState(() {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, LoginPage.id, (route) => false);
-                      });
-                    }
-                  } catch (exception) {
-                    await file.writeAsString(
-                        "$username,$password,$name\n", mode: FileMode.write);
-                  }
-                }else{
-                  await file.writeAsString(
-                      "$username,$password,$name\n", mode: FileMode.write);
-                  setState(() {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, LoginPage.id, (route) => false);
-                  });
+                UserManager userManager = UserManager();
+                if(await userManager.addUser(username, password, name)){
+                  Navigator.pushNamedAndRemoveUntil(context, LoginPage.id, (route) => false);
                 }
               },
               child: Container(
@@ -163,14 +132,5 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
     );
-  }
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    return directory.path;
-  }
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/users.txt');
   }
 }

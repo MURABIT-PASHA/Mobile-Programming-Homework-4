@@ -1,9 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:homework_4/registration_page.dart';
-import 'package:path_provider/path_provider.dart';
-
+import 'package:homework_4/user_manager.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,9 +16,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     String username = "";
     String password = "";
-    int controlFlag = 0;
     Color activeColor = const Color(0xFF000000);
     Color nonactiveColor = const Color(0xFFADADAD);
+    TextEditingController usernameController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -47,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
+                controller: usernameController,
                 onChanged: (value) {
                   username = value;
                 },
@@ -74,6 +73,7 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width - 20,
               height: 40,
               child: TextField(
+                controller: passwordController,
                 onChanged: (value) {
                   password = value;
                 },
@@ -93,44 +93,20 @@ class _LoginPageState extends State<LoginPage> {
             ),
             GestureDetector(
               onTap: () async {
-                final file = await _localFile;
-                if (await file.exists()) {
-                  try {
-                    file
-                        .openRead()
-                        .transform(utf8.decoder)
-                        .transform(const LineSplitter())
-                        .forEach((line) {
-                      var user = line.toString().split(",");
-                      if (user[0] == username && user[1] == password) {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (builder) =>
-                                    HomePage(title: user[2])),(route)=>false);
-                        controlFlag = 1;
-                      }
-                    });
-                    if (controlFlag == 0) {
-                      showDialog(
-                          context: context,
-                          builder: (builder) => const AlertDialog(
-                                content: Text("User couldn't find"),
-                              ));
-                    }
-                  } catch (exception) {
-                    showDialog(
-                        context: context,
-                        builder: (builder) => const AlertDialog(
-                              content: Text("Source couldn't find"),
-                            ));
-                  }
-                } else {
-                  showDialog(
-                      context: context,
-                      builder: (builder) => const AlertDialog(
-                            content: Text("Source couldn't find"),
-                          ));
+                usernameController.text = "";
+                passwordController.text = "";
+                usernameController.value = const TextEditingValue(text: "");
+                passwordController.value = const TextEditingValue(text: "");
+                UserManager userManager = UserManager();
+                List<String> users = await userManager.readUsers();
+                for (String user in users){
+                  print(user);
+                }
+                if(await userManager.controlUser(username, password)){
+                  String name = await userManager.getUserName(username, password);
+                  setState(() {
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (builder)=>HomePage(title: name)), (route) => false);
+                  });
                 }
               },
               child: Container(
@@ -163,16 +139,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/users.txt');
   }
 }
