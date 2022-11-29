@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:homework_4/contact_manager.dart';
 import 'package:path_provider/path_provider.dart';
 
 class EditPage extends StatefulWidget {
@@ -17,11 +18,13 @@ class _EditPageState extends State<EditPage> {
   Widget build(BuildContext context) {
     Color activeColor = const Color(0xFF000000);
     Color nonactiveColor = const Color(0xFFADADAD);
+    ContactManager contactManager = ContactManager();
+    String newName = "";
+    String newSurname = "";
+    String newNumber = "";
     String name = widget.contactInfo.split(",")[0];
     String surname = widget.contactInfo.split(",")[1];
     String number = widget.contactInfo.split(",")[2];
-    List<String> contacts = [];
-    String list = "";
     return Scaffold(
       body: Center(
         child: Container(
@@ -40,7 +43,7 @@ class _EditPageState extends State<EditPage> {
                 height: 40,
                 child: TextField(
                   onChanged: (value) {
-                    name = value;
+                    newName = value;
                   },
                   decoration: InputDecoration(
                     hintText: widget.contactInfo.split(",")[0],
@@ -67,7 +70,7 @@ class _EditPageState extends State<EditPage> {
                 height: 40,
                 child: TextField(
                   onChanged: (value) {
-                    surname = value;
+                    newSurname = value;
                   },
                   decoration: InputDecoration(
                     hintText: widget.contactInfo.split(",")[1],
@@ -94,7 +97,7 @@ class _EditPageState extends State<EditPage> {
                 height: 40,
                 child: TextField(
                   onChanged: (value) {
-                    number = value;
+                    newNumber = value;
                   },
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
@@ -119,6 +122,21 @@ class _EditPageState extends State<EditPage> {
                   children: [
                     ElevatedButton(
                         onPressed: () async {
+                          if (newName == ""){
+                            newName = name;
+                          }
+                          if (newSurname == ""){
+                            newSurname = surname;
+                          }
+                          if (newNumber == ""){
+                            newNumber = number;
+                          }
+                          if(await contactManager.editContact(newName, newSurname, newNumber, number)) {
+                            print("Lokum güzeldir kundi");
+                          }
+                          else{
+                            print("Error: Cannot added");
+                          }
 
                         },
                         style: ElevatedButton.styleFrom(
@@ -129,7 +147,8 @@ class _EditPageState extends State<EditPage> {
                         child: const Text("Save")),
                     ElevatedButton(
                         onPressed: () async {
-
+                            await contactManager.removeContact(number);
+                            Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(

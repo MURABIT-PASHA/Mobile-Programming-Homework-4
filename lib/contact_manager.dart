@@ -27,8 +27,6 @@ class ContactManager {
   Future<bool> removeContact(String number) async {
     bool returnType = false;
     final file = await _localFile;
-    var sinkA = file.openWrite(mode: FileMode.append);
-    var sinkW = file.openWrite(mode: FileMode.writeOnly);
     var sinkR = file.openRead();
     if (await file.exists()) {
       List<String> contacts = await readContacts();
@@ -41,16 +39,20 @@ class ContactManager {
           var contact = line.toString().split(",");
           if (contact[3] == number) {
             contacts.removeAt(index);
+            print("Contacts: $contacts");
             returnType = true;
           }
           index++;
         });
+        var sinkW = file.openWrite(mode: FileMode.write);
         sinkW.write("");
         sinkW.close();
+        var sinkA = file.openWrite(mode: FileMode.append);
         for(String contact in contacts){
           sinkA.write(contact);
         }
         sinkA.close();
+        print(contacts);
         return returnType;
       } catch (e) {
         return false;
@@ -102,9 +104,9 @@ class ContactManager {
     }
   }
 
-  Future<bool> editContact(String name, String surname, String newNumber, String oldNumber) async {
+  Future<bool> editContact(String name, String surname, String number, String oldNumber) async {
     if(await removeContact(oldNumber)){
-      if(await addContact(name, surname, newNumber)){
+      if(await addContact(name, surname, number)){
         return true;
       }
       else {

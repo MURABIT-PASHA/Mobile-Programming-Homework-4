@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:homework_4/contact_manager.dart';
 
 class AddPage extends StatefulWidget {
   static String id = "add_id";
@@ -13,6 +14,7 @@ class _AddPageState extends State<AddPage> {
   Widget build(BuildContext context) {
     Color activeColor = const Color(0xFF000000);
     Color nonactiveColor = const Color(0xFFADADAD);
+    ContactManager contactManager = ContactManager();
     String name = "";
     String surname = "";
     String number = "";
@@ -106,6 +108,21 @@ class _AddPageState extends State<AddPage> {
               ),
               ElevatedButton(
                   onPressed: () async {
+                    try{
+                      if (name == "" || surname == "" || number == ""){
+                        throw UnimplementedError;
+                      }
+                      else{
+                        if(await contactManager.addContact(name, surname, number)) {
+                          print("Başarılı");
+                          Navigator.pop(context);
+                        }else{
+                          print("Eklenemedi");
+                        }
+                      }
+                    }catch(e){
+                      print("Boş bırakılamaz");
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
