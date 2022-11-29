@@ -36,10 +36,10 @@ class ContactManager {
             .transform(utf8.decoder)
             .transform(const LineSplitter())
             .forEach((line) {
+
           var contact = line.toString().split(",");
-          if (contact[3] == number) {
+          if (contact[2] == number) {
             contacts.removeAt(index);
-            print("Contacts: $contacts");
             returnType = true;
           }
           index++;
@@ -49,10 +49,9 @@ class ContactManager {
         sinkW.close();
         var sinkA = file.openWrite(mode: FileMode.append);
         for(String contact in contacts){
-          sinkA.write(contact);
+          sinkA.write("$contact\n");
         }
         sinkA.close();
-        print(contacts);
         return returnType;
       } catch (e) {
         return false;
@@ -62,7 +61,7 @@ class ContactManager {
     }
   }
 
-  Future<bool> findContact(String number) async {
+  Future<bool> findByNumber(String number) async {
     bool returnType = false;
     final file = await _localFile;
     var sinkR = file.openRead();
@@ -85,15 +84,38 @@ class ContactManager {
       return false;
     }
   }
+  Future<bool> findByName(String name) async {
+    bool returnType = false;
+    final file = await _localFile;
+    var sinkR = file.openRead();
+    if (await file.exists()) {
+      try {
+        await sinkR
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())
+            .forEach((line) {
+          var contact = line.toString().split(",");
+          if (contact[0] == name) {
+            returnType = true;
+          }
+        });
+        return returnType;
+      } catch (e) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
   Future<bool> addContact(String name, String surname, String number) async {
-    if (!await findContact(number) && !(await readContacts() == [])) {
+    if (!await findByNumber(number) && !(await readContacts() == [])) {
       final file = await _localFile;
       var sinkW = file.openWrite(mode: FileMode.append);
       sinkW.write("$name,$surname,$number\n");
       sinkW.close();
       return true;
-    } else if (!await findContact(number) && (await readContacts() == [])){
+    } else if (!await findByNumber(number) && (await readContacts() == [])){
       final file = await _localFile;
       var sinkW = file.openWrite(mode: FileMode.write);
       sinkW.write("$name,$surname,$number\n");
@@ -118,26 +140,22 @@ class ContactManager {
     }
   }
 
-  Future<String> getContact(String name, String surname, String number) async {
+  Future<String> getContact(name) async {
     String specificLine = "";
-    final file = await _localFile;
-    var sinkR = file.openRead();
-      try {
-        await sinkR
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())
-            .forEach((line) {
-          var person = line.toString().split(",");
-          if (person[2] == number) {
-            specificLine = person.toString();
-          }
-        });
-        print(specificLine);
-        return specificLine;
+    if(await findByName(name)){
+      final file = await _localFile;
+      var sinkR = file.openRead();
+      await sinkR
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .forEach((line) {
+        var contact = line.toString().split(",");
+        if (contact[0] == name) {
+          specificLine = "${contact[0]}${contact[1]}${contact[2]}";
+        }
+      });
     }
-    catch(e){
-        return "$name,$surname,$number";
-    }
+      return specificLine;
   }
 
   Future<String> get _localPath async {
